@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.aguatimosim.clientes.dto.ClientDTO;
 import com.aguatimosim.clientes.entities.Client;
 import com.aguatimosim.clientes.repositories.ClientRepository;
+import com.aguatimosim.clientes.services.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service 
 public class ClientService {
@@ -18,7 +21,8 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public ClientDTO findById(Long id)    {
-        Client cliente = repository.findById(id).get();
+        Client cliente = repository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Cliente não encontrado"));
         return new ClientDTO(cliente);
     }
 
@@ -37,14 +41,22 @@ public class ClientService {
 
     @Transactional
     public  ClientDTO update(Long id, ClientDTO dto) {
-        Client cliente = repository.getReferenceById(id);
-        copyDtoToTabela(dto, cliente);
-        return new ClientDTO(repository.save(cliente));
+        try {
+            Client cliente = repository.getReferenceById(id);
+            copyDtoToTabela(dto, cliente);
+            return new ClientDTO(repository.save(cliente));
+        }
+        catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Cliente não encontrado");
+        }
     }
 
     @Transactional
     public void delete(Long id) {
-        repository.deleteById(id);
+    	if (!repository.existsById(id)) {
+    		throw new ResourceNotFoundException("Cliente não encontrado");
+    	}
+        repository.deleteById(id);    		
     }
 
     private void copyDtoToTabela(ClientDTO dto, Client cliente) {
