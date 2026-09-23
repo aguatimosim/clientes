@@ -19,6 +19,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.aguatimosim.clientes.dto.ClientDTO;
 import com.aguatimosim.clientes.services.ClientService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/clientes")
 public class ClientController {
@@ -39,7 +41,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientDTO> insert(@RequestBody ClientDTO dto) {
+    public ResponseEntity<ClientDTO> insert(@Valid @RequestBody ClientDTO dto) {
         dto = cliente.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(dto.getId()).toUri();
@@ -47,7 +49,7 @@ public class ClientController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<ClientDTO> update(@PathVariable Long id, @RequestBody ClientDTO dto)   {
+    public ResponseEntity<ClientDTO> update(@Valid @PathVariable Long id, @Valid @RequestBody ClientDTO dto)   {
         dto = cliente.update(id, dto);
         return ResponseEntity.ok(dto);
     }
