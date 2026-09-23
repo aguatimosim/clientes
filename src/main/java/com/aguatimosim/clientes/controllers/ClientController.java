@@ -22,7 +22,7 @@ import com.aguatimosim.clientes.services.ClientService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/clientes")
+@RequestMapping(value = "/clients")
 public class ClientController {
 
     @Autowired 
